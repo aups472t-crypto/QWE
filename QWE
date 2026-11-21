@@ -1,0 +1,35 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- 1. ซ่อนตัวละครและป้ายชื่อ (ฝั่ง Client)
+local function setInvisible(character, enabled)
+	for _, obj in ipairs(character:GetDescendants()) do
+		if obj:IsA("BasePart") or obj:IsA("Decal") then
+			if obj.Name ~= "HumanoidRootPart" then
+				obj.LocalTransparencyModifier = enabled and 1 or 0
+			end
+		elseif obj:IsA("BillboardGui") or obj:IsA("SurfaceGui") then
+			obj.Enabled = not enabled
+		end
+	end
+end
+
+if player.Character then
+	setInvisible(player.Character, true)
+end
+
+player.CharacterAdded:Connect(function(char)
+	task.wait(0.5)
+	setInvisible(char, true)
+end)
+
+-- 2. ซ่อน GUI ที่เกี่ยวกับหลอดเลือดบนหน้าจอผู้เล่น (ต้องปรับชื่อ Gui ให้ตรงกับแมพ)
+local playerGui = player:WaitForChild("PlayerGui")
+for _, gui in ipairs(playerGui:GetDescendants()) do
+	if gui:IsA("GuiObject") then
+		local n = string.lower(gui.Name)
+		if string.find(n, "health") or string.find(n, "hp") then
+			gui.Visible = false
+		end
+	end
+end
